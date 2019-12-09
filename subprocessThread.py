@@ -8,17 +8,17 @@ import subprocess
 
 
 # 分割线程
-class SegmentThread(QThread):
-    segmentThreadResult = pyqtSignal(str)
+class SubprocessThread(QThread):
+    threadResult = pyqtSignal(str)
 
     def __init__(self):
-        super(SegmentThread, self).__init__()
+        super(SubprocessThread, self).__init__()
         self.stopCommand = 'taskkill /F /IM '
         # 所调用的外部exe是否正在运行
         self.ExErunning = False
 
     # 设置
-    def setInputSegmentInfo(self, programFile):
+    def setInputInfo(self, programFile):
         self.programFile = programFile 
 
     # 强制结束执行 exe 文件或退出时操作
@@ -66,7 +66,7 @@ class SegmentThread(QThread):
             data = data.decode(
                 codecs.lookup(locale.getpreferredencoding()).name)
 
-            self.segmentThreadResult.emit(data)
+            self.threadResult.emit(data)
 
             # 第一条数据包含了输出行数信息，第一行的格式为“num:INT_N”
             if 'num' in data:
@@ -81,5 +81,5 @@ class SegmentThread(QThread):
         # exe 文件运行结束
         self.ExErunning = False
 
-        self.segmentThreadResult.emit("OK")
+        self.threadResult.emit("OK")
 
