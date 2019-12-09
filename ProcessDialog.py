@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QDialog, QPushButton, QHBoxLayout, QVBoxLayout,\
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
-from subprocessThread import subprocessThread
+from subprocessThread import SubprocessThread
 
 
 class ProcessDialog(QDialog):
@@ -22,6 +22,7 @@ class ProcessDialog(QDialog):
 
 
     def __initVariable(self):
+        # 此为示例
         self.progressFile = './modules/example.exe'
         self.thread = None
         self.count = 0
@@ -130,13 +131,9 @@ class ProcessDialog(QDialog):
         if self.thread is not None:
             return
 
-        # 选取当前选择的算法
-        methodIdx = self.selectMethodsCombox.currentIndex()
-
         self.thread = subprocessThread()
         self.thread.setInputInfo(self.programFile)
-        self.thread.ThreadResult.connect(self.updateShow)
-
+        self.thread.threadResult.connect(self.updateShow)
         self.thread.start()
 
     # 停止子线程
@@ -156,6 +153,8 @@ class ProcessDialog(QDialog):
     def closeEvent(self,event):
         if self.thread is not None:
             self.thread.stop()
+            self.thread.terminate()
+            del self.thread
 
         super().closeEvent(event)
 
@@ -184,16 +183,3 @@ class ProcessDialog(QDialog):
                 if flag == 1:
                     self.resultSignal.emit(index, px, py, pr)
 
-
-
-
-
-if __name__ == '__main__':
-    import sys
-    from PyQt5.QtWidgets import QApplication
-
-    app = QApplication(sys.argv)
-    viewer = processDialog()
-    viewer.show()
-
-    sys.exit(app.exec_())
